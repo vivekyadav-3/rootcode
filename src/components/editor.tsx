@@ -67,7 +67,13 @@ export function CodeEditor({ problemId, starterCode, problemTitle, problemDescri
   const [lineWrap, setLineWrap] = useState(true);
 
   // Submissions state
-  const [userSubmissions, setUserSubmissions] = useState<any[]>([]);
+  const [userSubmissions, setUserSubmissions] = useState<Array<{
+    id: string;
+    status: string;
+    runtime?: number | null;
+    memory?: number | null;
+    createdAt: string;
+  }>>([]);
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
 
   const editorRef = useRef<any>(null);
