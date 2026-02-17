@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submissions Submission[]
+}
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Problem {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  difficulty  Difficulty
+  order       Int      @unique
+  category    String
+  
+  // The boilerplate code shown to the user (e.g. "function solution() { ... }")
+  starterCode String   @db.Text
+  
+  // The correct solution (for admin reference/testing)
+  solutionCode String? @db.Text
+
+  testCases   TestCase[]
+  submissions Submission[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TestCase {
+  id             String  @id @default(cuid())
+  problemId      String
+  input          String
+  expectedOutput String
+  
+  problem        Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([problemId])
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  userId    String
+  problemId String
+  code      String   @db.Text
+  status    String   // "Accepted", "Wrong Answer", "Runtime Error", etc.
+  language  String
+  runtime   Float?
+  memory    Float?
+  
+  user      User     @relation(fields: [userId], references: [id])
+  problem   Problem  @relation(fields: [problemId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([problemId])
+  @@index([userId, status])
+  @@index([problemId, status])
+}

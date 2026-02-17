@@ -1,0 +1,74 @@
+services:
+  # Your existing database
+  postgres:
+    image: postgres:latest
+    container_name: leetcode-clone-db
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=leetcode_db
+    ports:
+      - "5432:5432"
+
+  # Judge0 Services
+  judge0-server:
+    image: judge0/judge0:1.13.1
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=judge0-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=judge0
+      - POSTGRES_PASSWORD=judge0
+      - POSTGRES_DB=judge0
+      - JUDGE0_CGROUP_V2=true
+      - JUDGE0_ENABLE_SANDBOX=false
+      - JUDGE0_DISABLE_SANDBOX=true
+    ports:
+      - "2358:2358"
+    privileged: true
+    security_opt:
+      - seccomp:unconfined
+    depends_on:
+      - judge0-db
+      - redis
+    restart: always
+
+  judge0-worker:
+    image: judge0/judge0:1.13.1
+    command: ["./scripts/workers"]
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=judge0-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=judge0
+      - POSTGRES_PASSWORD=judge0
+      - POSTGRES_DB=judge0
+      - JUDGE0_CGROUP_V2=true
+      - JUDGE0_ENABLE_SANDBOX=false
+      - JUDGE0_DISABLE_SANDBOX=true
+    privileged: true
+    security_opt:
+      - seccomp:unconfined
+    depends_on:
+      - judge0-db
+      - redis
+    restart: always
+
+  judge0-db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=judge0
+      - POSTGRES_PASSWORD=judge0
+      - POSTGRES_DB=judge0
+    restart: always
+
+  redis:
+    image: redis:7
+    restart: always
