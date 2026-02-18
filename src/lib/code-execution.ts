@@ -27,7 +27,8 @@ export function wrapCode(code: string, languageId: string, problemTitle: string)
     "best time to buy and sell stock": { method: "maxProfit", inputType: "array" },
     "majority element": { method: "majorityElement", inputType: "array" },
     "move zeroes": { method: "moveZeroes", inputType: "array", outputType: "void" },
-    "restore ip addresses": { method: "restoreIpAddresses", inputType: "string", outputType: "array" }
+    "restore ip addresses": { method: "restoreIpAddresses", inputType: "string", outputType: "array" },
+    "insert interval": { method: "insert", inputType: "matrix_and_array", outputType: "matrix" }
   };
 
   const config = problems[normalizedTitle];
@@ -98,6 +99,19 @@ for (let i = 0; i < commands.length; i++) {
         result.push(null);
     } else {
         const output = instance[cmd](...arg);
+        result.push(output === undefined ? null : output);
+    }
+}
+        `;
+        break;
+      case "matrix_and_array":
+        parsingLogic = `
+const lines = input.split('\\n');
+const arg1 = JSON.parse(lines[0]);
+const arg2 = JSON.parse(lines[1]);
+        `;
+        executionCall = `const result = ${config.method}(arg1, arg2);`;
+        break;
         result.push(output === undefined ? null : output);
     }
 }
@@ -205,8 +219,24 @@ for i, cmd in enumerate(commands):
         arg = args[i]
         out = func(*arg)
         result.append(out)
+      case "two_strings":
+          parsingLogic = `
+lines = sys.stdin.read().strip().split('\\n')
+if len(lines) >= 2:
+    s = lines[0].strip().strip('"')
+    t = lines[1].strip().strip('"')
+else:
+    s = ""
 `;
           break;
+      case "matrix_and_array":
+        parsingLogic = `
+lines = sys.stdin.read().strip().split('\\n')
+arg1 = json.loads(lines[0])
+arg2 = json.loads(lines[1])
+        `;
+        executionCall = `result = sol.${config.method}(arg1, arg2)`;
+        break;
     }
 
     let outputLogic = `print(json.dumps(result, separators=(',', ':')))`;
@@ -241,13 +271,12 @@ if __name__ == '__main__':
         if (line == null) return;
     `;
     let executionCall = "";
-    let helperMethods = "";
     
     // Shared Helper Methods definition for Java
     const arrayHelpers = `
     private static int[] parseArray(String s) {
         s = s.trim();
-        if (s.length() < 2) return new int[0];
+        if (s.equals("[]") || s.length() < 2) return new int[0];
         s = s.substring(1, s.length() - 1);
         if (s.isEmpty()) return new int[0];
         String[] parts = s.split(",");
@@ -258,12 +287,51 @@ if __name__ == '__main__':
         return res;
     }
 
+    private static int[][] parse2DArray(String s) {
+        s = s.trim();
+        if (s.equals("[]") || s.length() < 2) return new int[0][0];
+        s = s.substring(1, s.length() - 1); // remove outer []
+        
+        java.util.List<int[]> list = new java.util.ArrayList<>();
+        int balance = 0;
+        int start = 0;
+        for(int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '[') balance++;
+            else if (c == ']') balance--;
+            else if (c == ',' && balance == 0) {
+                list.add(parseArray(s.substring(start, i)));
+                start = i + 1;
+            }
+        }
+        if (start < s.length()) {
+            list.add(parseArray(s.substring(start)));
+        }
+        
+        int[][] res = new int[list.size()][];
+        for(int i=0; i<list.size(); i++) {
+            res[i] = list.get(i);
+        }
+        return res;
+    }
+
     private static String arrayToString(int[] arr) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for(int i=0; i<arr.length; i++) {
             sb.append(arr[i]);
             if (i < arr.length - 1) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    private static String matrixToString(int[][] matrix) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for(int i=0; i<matrix.length; i++) {
+            sb.append(arrayToString(matrix[i]));
+            if (i < matrix.length - 1) sb.append(",");
         }
         sb.append("]");
         return sb.toString();
@@ -298,26 +366,6 @@ if __name__ == '__main__':
         parsingLogic += `
         int[] arg = parseArray(line);
         `;
-        if (config.outputType === "void") {
-            executionCall = `
-            Solution sol = new Solution();
-            sol.${config.method}(arg);
-            System.out.println(arrayToString(arg));
-            `;
-        } else if (config.outputType === "array") {
-            executionCall = `
-            Solution sol = new Solution();
-            int[] result = sol.${config.method}(arg);
-            System.out.println(arrayToString(result));
-            `;
-        } else if (config.outputType === "boolean") {
-            executionCall = `
-            Solution sol = new Solution();
-            boolean result = sol.${config.method}(arg);
-            System.out.println(result);
-            `;
-        } else {
-            executionCall = `
             Solution sol = new Solution();
             var result = sol.${config.method}(arg);
             System.out.println(result);
