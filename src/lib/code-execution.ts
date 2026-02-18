@@ -436,6 +436,165 @@ class Main {
 }
     `.trim().replace(/\r/g, "");
   }
+
+  // C++ (GCC 9.2.0) Wrapper
+  if (languageId === "54") {
+    let parsingLogic = `
+    string line;
+    getline(cin, line);
+    `;
+    let executionCall = "";
+    let helperFunctions = `
+    // Helper to print vector
+    void printVector(const vector<string>& v) {
+        cout << "[";
+        for(size_t i = 0; i < v.size(); ++i) {
+            cout << "\\"" << v[i] << "\\"";
+            if(i < v.size() - 1) cout << ",";
+        }
+        cout << "]";
+    }
+    
+    // Helper to print int vector
+    void printIntVector(const vector<int>& v) {
+        cout << "[";
+        for(size_t i = 0; i < v.size(); ++i) {
+            cout << v[i];
+            if(i < v.size() - 1) cout << ",";
+        }
+        cout << "]";
+    }
+
+    // Helper to parse int array from string "[1,2,3]"
+    vector<int> parseIntArray(string s) {
+        vector<int> res;
+        if(s.length() < 2) return res;
+        s = s.substr(1, s.length() - 2);
+        stringstream ss(s);
+        string item;
+        while(getline(ss, item, ',')) {
+           if(!item.empty()) res.push_back(stoi(item));
+        }
+        return res;
+    }
+    `;
+
+    switch (config.inputType) {
+        case "string":
+             parsingLogic += `
+             if(!line.empty() && line.front() == '"' && line.back() == '"') {
+                 line = line.substr(1, line.size() - 2);
+             }
+             string arg = line;
+             `;
+             if (config.outputType === "array") {
+                 executionCall = `
+                 Solution sol;
+                 vector<string> result = sol.${config.method}(arg);
+                 printVector(result);
+                 `;
+             } else {
+                 executionCall = `
+                 Solution sol;
+                 auto result = sol.${config.method}(arg);
+                 cout << result;
+                 `;
+             }
+             break;
+        case "int":
+             parsingLogic += `
+             int arg = stoi(line);
+             `;
+             executionCall = `
+             Solution sol;
+             auto result = sol.${config.method}(arg);
+             cout << (result ? "true" : "false"); 
+             `;
+             if (config.outputType !== "boolean") {
+                  executionCall = `
+                 Solution sol;
+                 auto result = sol.${config.method}(arg);
+                 cout << result;
+                 `;
+             }
+             break;
+        case "array":
+             parsingLogic += `
+             vector<int> arg = parseIntArray(line);
+             `;
+             if (config.outputType === "array") {
+                 executionCall = `
+                 Solution sol;
+                 vector<int> result = sol.${config.method}(arg);
+                 printIntVector(result);
+                 `;
+             } else if (config.outputType === "boolean") {
+                 executionCall = `
+                 Solution sol;
+                 bool result = sol.${config.method}(arg);
+                 cout << (result ? "true" : "false");
+                 `;
+             } else if (config.outputType === "void") {
+                  executionCall = `
+                 Solution sol;
+                 sol.${config.method}(arg);
+                 printIntVector(arg);
+                 `;
+             } else {
+                 executionCall = `
+                 Solution sol;
+                 cout << sol.${config.method}(arg);
+                 `;
+             }
+             break;
+        case "two_args_arr_int":
+             parsingLogic = `
+             string line2;
+             getline(cin, line2);
+             vector<int> p1 = parseIntArray(line);
+             int p2 = stoi(line2);
+             `;
+             if (config.outputType === "array") {
+                  executionCall = `
+                 Solution sol;
+                 vector<int> result = sol.${config.method}(p1, p2);
+                 printIntVector(result);
+                 `;
+             } else {
+                  executionCall = `
+                 Solution sol;
+                 cout << sol.${config.method}(p1, p2); 
+                 `;
+             }
+             break;
+    }
+
+    return `
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
+#include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
+
+using namespace std;
+
+${code}
+
+${helperFunctions}
+
+int main() {
+    ${parsingLogic}
+    ${executionCall}
+    return 0;
+}
+    `;
+  }
+
   
   return code.replace(/\r/g, "");
 }
