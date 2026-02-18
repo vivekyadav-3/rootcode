@@ -239,6 +239,8 @@ export async function submitCode(formData: FormData) {
     // Return a structured error object that the frontend can display
     return {
       status: "Runtime Error", // or "Internal Error"
+      runtime: 0,
+      memory: 0,
       failureDetails: {
         input: "",
         expected: "",
