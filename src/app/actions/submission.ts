@@ -113,10 +113,8 @@ export async function submitCode(formData: FormData) {
                  console.error("[Submission] Fetch Failed:", err);
                  throw err;
              }
-                 }
-             };
-
         } else {
+
             // Execute with Judge0 (Local/RapidAPI) - Fallback
             const headers: any = { 
             "Content-Type": "application/json" 
