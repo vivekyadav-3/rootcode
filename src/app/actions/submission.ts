@@ -67,6 +67,7 @@ export async function submitCode(formData: FormData) {
        // Wrap user code in a complete program
         const wrappedCode = wrapCode(code, languageId, problem.title);
         
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let result: any = {};
 
         if (usePiston && pistonConfig) {
@@ -116,7 +117,7 @@ export async function submitCode(formData: FormData) {
         } else {
 
             // Execute with Judge0 (Local/RapidAPI) - Fallback
-            const headers: any = { 
+            const headers: Record<string, string> = { 
             "Content-Type": "application/json" 
             };
             
@@ -241,6 +242,7 @@ export async function submitCode(formData: FormData) {
       failureDetails: null
     };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("🔥 Error in submitCode action:", error);
     let errorMessage = error.message || "An unexpected error occurred";
