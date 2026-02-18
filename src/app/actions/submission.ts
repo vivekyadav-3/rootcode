@@ -110,11 +110,62 @@ export async function submitCode(formData: FormData) {
                         description: data.run.code === 0 ? "Accepted" : "Runtime Error"
                     }
                 };
+                };
              } catch (err) {
-                 console.error("[Submission] Fetch Failed:", err);
-                 throw err;
+                 console.error("[Submission] Piston Failed:", err);
+                 // Fallback to CodeX API will happen if result is empty
              }
-        } else {
+        }
+
+        // 3.1. Fallback: CodeX API (Free, Public)
+        if (!result.stdout && !result.stderr && !result.compile_output) {
+             const codexLang = {
+                 "63": "js",
+                 "71": "py",
+                 "62": "java",
+                 "54": "cpp"
+             }[languageId];
+
+             if (codexLang) {
+                 console.log(`[Submission] Attempting CodeX API (Fallback) for ${codexLang}`);
+                 try {
+                    const params = new URLSearchParams();
+                    params.append("code", wrappedCode);
+                    params.append("language", codexLang);
+                    params.append("input", testCase.input);
+
+                    const response = await fetch("https://api.codex.jaagrav.in", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: params
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        result = {
+                            stdout: data.output || "",
+                            stderr: data.error || "",
+                            compile_output: "",
+                            time: "0.01", 
+                            memory: "0",
+                            status: {
+                                id: (data.error) ? 6 : 3,
+                                description: (data.error) ? "Runtime Error" : "Accepted"
+                            }
+                        };
+                         console.log("[Submission] CodeX Success");
+                    } else {
+                        console.error(`[Submission] CodeX Error: ${response.status}`);
+                    }
+                 } catch (e) {
+                      console.error("[Submission] CodeX Failed:", e);
+                 }
+             }
+        }
+
+        // 3.2. Fallback: Judge0 (if result still empty)
+        if (!result.stdout && !result.stderr && !result.compile_output) {
+
 
             // Execute with Judge0 (Local/RapidAPI) - Fallback
             const headers: Record<string, string> = { 
