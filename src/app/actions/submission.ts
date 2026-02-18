@@ -110,7 +110,6 @@ export async function submitCode(formData: FormData) {
                         description: data.run.code === 0 ? "Accepted" : "Runtime Error"
                     }
                 };
-                };
              } catch (err) {
                  console.error("[Submission] Piston Failed:", err);
                  // Fallback to CodeX API will happen if result is empty
