@@ -5,7 +5,7 @@ export function wrapCode(code: string, languageId: string, problemTitle: string)
   const normalizedTitle = problemTitle.toLowerCase().trim();
   
   // Configuration for each problem's execution signature
-  const problems: Record<string, { method: string; inputType: "int" | "string" | "array" | "two_args_arr_int" | "two_strings" | "class_methods"; outputType?: "void" | "array" | "boolean" }> = {
+  const problems: Record<string, { method: string; inputType: "int" | "string" | "array" | "two_args_arr_int" | "two_strings" | "class_methods" | "matrix_and_array"; outputType?: "void" | "array" | "boolean" | "matrix" }> = {
     "two sum": { method: "twoSum", inputType: "two_args_arr_int", outputType: "array" },
     "palindrome number": { method: "isPalindrome", inputType: "int", outputType: "boolean" },
     "reverse string": { method: "reverseString", inputType: "string" }, 
@@ -112,11 +112,6 @@ const arg2 = JSON.parse(lines[1]);
         `;
         executionCall = `const result = ${config.method}(arg1, arg2);`;
         break;
-        result.push(output === undefined ? null : output);
-    }
-}
-        `;
-        break;
     }
 
     let outputLogic = `console.log(JSON.stringify(result));`;
@@ -219,14 +214,6 @@ for i, cmd in enumerate(commands):
         arg = args[i]
         out = func(*arg)
         result.append(out)
-      case "two_strings":
-          parsingLogic = `
-lines = sys.stdin.read().strip().split('\\n')
-if len(lines) >= 2:
-    s = lines[0].strip().strip('"')
-    t = lines[1].strip().strip('"')
-else:
-    s = ""
 `;
           break;
       case "matrix_and_array":
@@ -261,8 +248,6 @@ if __name__ == '__main__':
 
   // Java (OpenJDK 13.0.1) Wrapper
   if (languageId === "62") {
-    // Sanitize user code: remove public from class Solution to avoid naming conflicts with Main
-    // Also use a more robust regex to handle comments/whitespace before the class keyword
     const sanitizedCode = code.replace(/public\s+class\s+Solution/i, "class Solution");
     
     let parsingLogic = `
@@ -271,8 +256,8 @@ if __name__ == '__main__':
         if (line == null) return;
     `;
     let executionCall = "";
+    let helperMethods = "";
     
-    // Shared Helper Methods definition for Java
     const arrayHelpers = `
     private static int[] parseArray(String s) {
         s = s.trim();
@@ -366,6 +351,26 @@ if __name__ == '__main__':
         parsingLogic += `
         int[] arg = parseArray(line);
         `;
+        if (config.outputType === "void") {
+            executionCall = `
+            Solution sol = new Solution();
+            sol.${config.method}(arg);
+            System.out.println(arrayToString(arg));
+            `;
+        } else if (config.outputType === "array") {
+            executionCall = `
+            Solution sol = new Solution();
+            int[] result = sol.${config.method}(arg);
+            System.out.println(arrayToString(result));
+            `;
+        } else if (config.outputType === "boolean") {
+            executionCall = `
+            Solution sol = new Solution();
+            boolean result = sol.${config.method}(arg);
+            System.out.println(result);
+            `;
+        } else {
+            executionCall = `
             Solution sol = new Solution();
             var result = sol.${config.method}(arg);
             System.out.println(result);
@@ -399,6 +404,19 @@ if __name__ == '__main__':
         }
         helperMethods += arrayHelpers;
         break;
+      case "matrix_and_array":
+        parsingLogic = `
+        int[][] arg1 = parse2DArray(line);
+        String line2 = reader.readLine();
+        int[] arg2 = parseArray(line2);
+        `;
+        executionCall = `
+        Solution sol = new Solution();
+        int[][] result = sol.${config.method}(arg1, arg2);
+        System.out.println(matrixToString(result));
+        `;
+        helperMethods += arrayHelpers;
+        break;
     }
 
     return `
@@ -418,166 +436,6 @@ class Main {
 }
     `.trim().replace(/\r/g, "");
   }
-  // C++ (GCC 9.2.0) Wrapper
-  if (languageId === "54") {
-    let parsingLogic = `
-    string line;
-    getline(cin, line);
-    `;
-    let executionCall = "";
-    let helperFunctions = `
-    // Helper to print vector
-    void printVector(const vector<string>& v) {
-        cout << "[";
-        for(size_t i = 0; i < v.size(); ++i) {
-            cout << "\\"" << v[i] << "\\"";
-            if(i < v.size() - 1) cout << ",";
-        }
-        cout << "]";
-    }
-    
-    // Helper to print int vector
-    void printIntVector(const vector<int>& v) {
-        cout << "[";
-        for(size_t i = 0; i < v.size(); ++i) {
-            cout << v[i];
-            if(i < v.size() - 1) cout << ",";
-        }
-        cout << "]";
-    }
-
-    // Helper to parse int array from string "[1,2,3]"
-    vector<int> parseIntArray(string s) {
-        vector<int> res;
-        if(s.length() < 2) return res;
-        s = s.substr(1, s.length() - 2);
-        stringstream ss(s);
-        string item;
-        while(getline(ss, item, ',')) {
-           if(!item.empty()) res.push_back(stoi(item));
-        }
-        return res;
-    }
-    `;
-
-    switch (config.inputType) {
-        case "string":
-             // Remove surrounding quotes if present
-             parsingLogic += `
-             if(!line.empty() && line.front() == '"' && line.back() == '"') {
-                 line = line.substr(1, line.size() - 2);
-             }
-             string arg = line;
-             `;
-             if (config.outputType === "array") {
-                 executionCall = `
-                 Solution sol;
-                 vector<string> result = sol.${config.method}(arg);
-                 printVector(result);
-                 `;
-             } else {
-                 executionCall = `
-                 Solution sol;
-                 auto result = sol.${config.method}(arg);
-                 cout << result;
-                 `;
-             }
-             break;
-        case "int":
-             parsingLogic += `
-             int arg = stoi(line);
-             `;
-             executionCall = `
-             Solution sol;
-             auto result = sol.${config.method}(arg);
-             cout << (result ? "true" : "false"); // Assuming boolean output for simple int inputs mostly
-             `;
-             // Adjust if output is int
-             if (config.outputType !== "boolean") {
-                  executionCall = `
-                 Solution sol;
-                 auto result = sol.${config.method}(arg);
-                 cout << result;
-                 `;
-             }
-             break;
-        case "array":
-             parsingLogic += `
-             vector<int> arg = parseIntArray(line);
-             `;
-             if (config.outputType === "array") {
-                 executionCall = `
-                 Solution sol;
-                 vector<int> result = sol.${config.method}(arg);
-                 printIntVector(result);
-                 `;
-             } else if (config.outputType === "boolean") {
-                 executionCall = `
-                 Solution sol;
-                 bool result = sol.${config.method}(arg);
-                 cout << (result ? "true" : "false");
-                 `;
-             } else if (config.outputType === "void") {
-                  executionCall = `
-                 Solution sol;
-                 sol.${config.method}(arg);
-                 printIntVector(arg);
-                 `;
-             } else {
-                 executionCall = `
-                 Solution sol;
-                 cout << sol.${config.method}(arg);
-                 `;
-             }
-             break;
-        case "two_args_arr_int":
-             parsingLogic = `
-             // line has first arg
-             string line2;
-             getline(cin, line2);
-             vector<int> p1 = parseIntArray(line);
-             int p2 = stoi(line2);
-             `;
-             if (config.outputType === "array") {
-                  executionCall = `
-                 Solution sol;
-                 vector<int> result = sol.${config.method}(p1, p2);
-                 printIntVector(result);
-                 `;
-             } else {
-                  executionCall = `
-                 Solution sol;
-                 cout << sol.${config.method}(p1, p2); 
-                 `;
-             }
-             break;
-    }
-
-    return `
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
-#include <map>
-#include <unordered_map>
-#include <set>
-#include <unordered_set>
-
-using namespace std;
-
-${code}
-
-${helperFunctions}
-
-int main() {
-    ${parsingLogic}
-    ${executionCall}
-    return 0;
-}
-    `;
-  }
-
+  
   return code.replace(/\r/g, "");
 }
