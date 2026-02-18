@@ -4,326 +4,140 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const problems = [
-    // --- TOPIC 1: ARRAY ---
-    {
-      order: 20, title: "Kadane's Algorithm", difficulty: "MEDIUM", category: "Array",
-      description: "Given an integer array `nums`, find the subarray with the largest sum and return its sum.",
-      starterCode: "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxSubArray = function(nums) {\n    \n};",
-      testCases: [{ input: "[-2,1,-3,4,-1,2,1,-5,4]", expectedOutput: "6" }, { input: "[5,4,-1,7,8]", expectedOutput: "23" }]
-    },
-    {
-      order: 21, title: "Next Permutation", difficulty: "MEDIUM", category: "Array",
-      description: "Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.",
-      starterCode: "var nextPermutation = function(nums) {\n    \n};",
-      testCases: [{ input: "[1,2,3]", expectedOutput: "[1,3,2]" }, { input: "[3,2,1]", expectedOutput: "[1,2,3]" }]
-    },
-    {
-       order: 22, title: "Rotate Image", difficulty: "MEDIUM", category: "Array",
-       description: "You are given an n x n 2D matrix representing an image, rotate the image by 90 degrees (clockwise).",
-       starterCode: "var rotate = function(matrix) {\n    \n};",
-       testCases: [{ input: "[[1,2,3],[4,5,6],[7,8,9]]", expectedOutput: "[[7,4,1],[8,5,2],[9,6,3]]" }]
-    },
-    {
-      order: 23, title: "Merge Intervals", difficulty: "MEDIUM", category: "Array",
-      description: "Given an array of intervals, merge all overlapping intervals.",
-      starterCode: "var merge = function(intervals) {\n    \n};",
-      testCases: [{ input: "[[1,3],[2,6],[8,10],[15,18]]", expectedOutput: "[[1,6],[8,10],[15,18]]" }]
-    },
-    {
-      order: 24, title: "Spiral Matrix", difficulty: "MEDIUM", category: "Array",
-      description: "Given an m x n matrix, return all elements of the matrix in spiral order.",
-      starterCode: "var spiralOrder = function(matrix) {\n    \n};",
-      testCases: [{ input: "[[1,2,3],[4,5,6],[7,8,9]]", expectedOutput: "[1,2,3,6,9,8,7,4,5]" }]
-    },
-    {
-       order: 25, title: "Set Matrix Zeroes", difficulty: "MEDIUM", category: "Array",
-       description: "Given an m x n integer matrix, if an element is 0, set its entire row and column to 0's.",
-       starterCode: "var setZeroes = function(matrix) {\n    \n};",
-       testCases: [{ input: "[[1,1,1],[1,0,1],[1,1,1]]", expectedOutput: "[[1,0,1],[0,0,0],[1,0,1]]" }]
-    },
-    {
-      order: 26, title: "Pascal's Triangle", difficulty: "EASY", category: "Array",
-      description: "Given an integer `numRows`, return the first numRows of Pascal's triangle.",
-      starterCode: "var generate = function(numRows) {\n    \n};",
-      testCases: [{ input: "5", expectedOutput: "[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]" }]
-    },
-    {
-      order: 27, title: "Product of Array Except Self", difficulty: "MEDIUM", category: "Array",
-      description: "Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of nums except nums[i].",
-      starterCode: "var productExceptSelf = function(nums) {\n    \n};",
-      testCases: [{ input: "[1,2,3,4]", expectedOutput: "[24,12,8,6]" }]
-    },
-    {
-      order: 28, title: "Sort Colors", difficulty: "MEDIUM", category: "Array",
-      description: "Given an array `nums` with n objects colored red, white, or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white, and blue.",
-      starterCode: "var sortColors = function(nums) {\n    \n};",
-      testCases: [{ input: "[2,0,2,1,1,0]", expectedOutput: "[0,0,1,1,2,2]" }]
-    },
-    {
-      order: 29, title: "Search a 2D Matrix", difficulty: "MEDIUM", category: "Array",
-      description: "Write an efficient algorithm that searches for a value in an m x n matrix.",
-      starterCode: "var searchMatrix = function(matrix, target) {\n    \n};",
-      testCases: [{ input: "[[1,3,5,7],[10,11,16,20],[23,30,34,60]]\n3", expectedOutput: "true" }]
-    },
+    // --- 1. ARRAYS & HASHING (1-10) ---
+    { order: 1, title: "Two Sum", difficulty: "EASY", category: "Arrays & Hashing", description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.", starterCode: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    \n};", testCases: [{ input: "[2,7,11,15]\n9", expectedOutput: "[0,1]" }] },
+    { order: 2, title: "Contains Duplicate", difficulty: "EASY", category: "Arrays & Hashing", description: "Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.", starterCode: "var containsDuplicate = function(nums) {\n    \n};", testCases: [{ input: "[1,2,3,1]", expectedOutput: "true" }] },
+    { order: 3, title: "Valid Anagram", difficulty: "EASY", category: "Arrays & Hashing", description: "Given two strings s and t, return true if t is an anagram of s, and false otherwise.", starterCode: "var isAnagram = function(s, t) {\n    \n};", testCases: [{ input: "\"anagram\"\n\"nagaram\"", expectedOutput: "true" }] },
+    { order: 4, title: "Group Anagrams", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Given an array of strings strs, group the anagrams together.", starterCode: "var groupAnagrams = function(strs) {\n    \n};", testCases: [{ input: "[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]", expectedOutput: "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]" }] },
+    { order: 5, title: "Top K Frequent Elements", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Given an integer array nums and an integer k, return the k most frequent elements.", starterCode: "var topKFrequent = function(nums, k) {\n    \n};", testCases: [{ input: "[1,1,1,2,2,3]\n2", expectedOutput: "[1,2]" }] },
+    { order: 6, title: "Product of Array Except Self", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].", starterCode: "var productExceptSelf = function(nums) {\n    \n};", testCases: [{ input: "[1,2,3,4]", expectedOutput: "[24,12,8,6]" }] },
+    { order: 7, title: "Valid Sudoku", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Determine if a 9 x 9 Sudoku board is valid.", starterCode: "var isValidSudoku = function(board) {\n    \n};", testCases: [{ input: "[[...]]", expectedOutput: "true" }] },
+    { order: 8, title: "Longest Consecutive Sequence", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.", starterCode: "var longestConsecutive = function(nums) {\n    \n};", testCases: [{ input: "[100,4,200,1,3,2]", expectedOutput: "4" }] },
+    { order: 9, title: "Encode and Decode Strings", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Design an algorithm to encode a list of strings to a string.", starterCode: "var encode = function(strs) {};\nvar decode = function(s) {};", testCases: [{ input: "[\"lint\",\"code\"]", expectedOutput: "[\"lint\",\"code\"]" }] },
+    { order: 10, title: "Subarray Sum Equals K", difficulty: "MEDIUM", category: "Arrays & Hashing", description: "Given an array of integers nums and an integer k, return the total number of subarrays whose sum equals to k.", starterCode: "var subarraySum = function(nums, k) {\n    \n};", testCases: [{ input: "[1,1,1]\n2", expectedOutput: "2" }] },
 
-    // --- TOPIC 2: STRING ---
-    {
-      order: 30, title: "Longest Substring Without Repeating Characters", difficulty: "MEDIUM", category: "String",
-      description: "Given a string `s`, find the length of the longest substring without repeating characters.",
-      starterCode: "var lengthOfLongestSubstring = function(s) {\n    \n};",
-      testCases: [{ input: "\"abcabcbb\"", expectedOutput: "3" }, { input: "\"bbbbb\"", expectedOutput: "1" }]
-    },
-    {
-       order: 31, title: "Longest Palindromic Substring", difficulty: "MEDIUM", category: "String",
-       description: "Given a string `s`, return the longest palindromic substring in `s`.",
-       starterCode: "var longestPalindrome = function(s) {\n    \n};",
-       testCases: [{ input: "\"babad\"", expectedOutput: "\"bab\"" }]
-    },
-    {
-      order: 32, title: "String to Integer (atoi)", difficulty: "MEDIUM", category: "String",
-      description: "Implement the `myAtoi(string s)` function, which converts a string to a 32-bit signed integer.",
-      starterCode: "var myAtoi = function(s) {\n    \n};",
-      testCases: [{ input: "\"42\"", expectedOutput: "42" }, { input: "\"   -42\"", expectedOutput: "-42" }]
-    },
-    {
-      order: 33, title: "Multiply Strings", difficulty: "MEDIUM", category: "String",
-      description: "Given two non-negative integers `num1` and `num2` represented as strings, return the product of `num1` and `num2`, also represented as a string.",
-      starterCode: "var multiply = function(num1, num2) {\n    \n};",
-      testCases: [{ input: "\"2\"\n\"3\"", expectedOutput: "\"6\"" }]
-    },
-    {
-      order: 34, title: "Group Anagrams", difficulty: "MEDIUM", category: "String",
-      description: "Given an array of strings `strs`, group the anagrams together. You can return the answer in any order.",
-      starterCode: "var groupAnagrams = function(strs) {\n    \n};",
-      testCases: [{ input: "[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]", expectedOutput: "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]" }]
-    },
-    {
-      order: 35, title: "Longest Common Prefix", difficulty: "EASY", category: "String",
-      description: "Write a function to find the longest common prefix string amongst an array of strings.",
-      starterCode: "var longestCommonPrefix = function(strs) {\n    \n};",
-      testCases: [{ input: "[\"flower\",\"flow\",\"flight\"]", expectedOutput: "\"fl\"" }]
-    },
-    {
-      order: 36, title: "Longest Valid Parentheses", difficulty: "HARD", category: "String",
-      description: "Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.",
-      starterCode: "var longestValidParentheses = function(s) {\n    \n};",
-      testCases: [{ input: "\")()()\"", expectedOutput: "4" }]
-    },
-    {
-      order: 37, title: "Edit Distance", difficulty: "HARD", category: "String",
-      description: "Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.",
-      starterCode: "var minDistance = function(word1, word2) {\n    \n};",
-      testCases: [{ input: "\"horse\"\n\"ros\"", expectedOutput: "3" }]
-    },
-    {
-      order: 38, title: "Wildcard Matching", difficulty: "HARD", category: "String",
-      description: "Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*'.",
-      starterCode: "var isMatch = function(s, p) {\n    \n};",
-      testCases: [{ input: "\"aa\"\n\"*\"", expectedOutput: "true" }]
-    },
-    {
-      order: 39, title: "Simplify Path", difficulty: "MEDIUM", category: "String",
-      description: "Given an absolute path for a Unix-style file system, simplify it.",
-      starterCode: "var simplifyPath = function(path) {\n    \n};",
-      testCases: [{ input: "\"/home/\"", expectedOutput: "\"/home\"" }]
-    },
+    // --- 2. TWO POINTERS (11-20) ---
+    { order: 11, title: "Valid Palindrome", difficulty: "EASY", category: "Two Pointers", description: "Given a string s, return true if it is a palindrome, considering only alphanumeric characters and ignoring cases.", starterCode: "var isPalindrome = function(s) {\n    \n};", testCases: [{ input: "\"A man, a plan, a canal: Panama\"", expectedOutput: "true" }] },
+    { order: 12, title: "Two Sum II - Input Array Sorted", difficulty: "MEDIUM", category: "Two Pointers", description: "Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number.", starterCode: "var twoSum = function(numbers, target) {\n    \n};", testCases: [{ input: "[2,7,11,15]\n9", expectedOutput: "[1,2]" }] },
+    { order: 13, title: "3Sum", difficulty: "MEDIUM", category: "Two Pointers", description: "Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.", starterCode: "var threeSum = function(nums) {\n    \n};", testCases: [{ input: "[-1,0,1,2,-1,-4]", expectedOutput: "[[-1,-1,2],[-1,0,1]]" }] },
+    { order: 14, title: "Container With Most Water", difficulty: "MEDIUM", category: "Two Pointers", description: "You are given an integer array height of length n. Find two lines that together with the x-axis form a container, such that the container contains the most water.", starterCode: "var maxArea = function(height) {\n    \n};", testCases: [{ input: "[1,8,6,2,5,4,8,3,7]", expectedOutput: "49" }] },
+    { order: 15, title: "Trapping Rain Water", difficulty: "HARD", category: "Two Pointers", description: "Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.", starterCode: "var trap = function(height) {\n    \n};", testCases: [{ input: "[0,1,0,2,1,0,1,3,2,1,2,1]", expectedOutput: "6" }] },
+    { order: 16, title: "Move Zeroes", difficulty: "EASY", category: "Two Pointers", description: "Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.", starterCode: "var moveZeroes = function(nums) {\n    \n};", testCases: [{ input: "[0,1,0,3,12]", expectedOutput: "[1,3,12,0,0]" }] },
+    { order: 17, title: "Remove Duplicates from Sorted Array", difficulty: "EASY", category: "Two Pointers", description: "Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once.", starterCode: "var removeDuplicates = function(nums) {\n    \n};", testCases: [{ input: "[1,1,2]", expectedOutput: "2" }] },
+    { order: 18, title: "Squares of a Sorted Array", difficulty: "EASY", category: "Two Pointers", description: "Given an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.", starterCode: "var sortedSquares = function(nums) {\n    \n};", testCases: [{ input: "[-4,-1,0,3,10]", expectedOutput: "[0,1,9,16,100]" }] },
+    { order: 19, title: "Rotate Array", difficulty: "MEDIUM", category: "Two Pointers", description: "Given an integer array nums, rotate the array to the right by k steps, where k is non-negative.", starterCode: "var rotate = function(nums, k) {\n    \n};", testCases: [{ input: "[1,2,3,4,5,6,7]\n3", expectedOutput: "[5,6,7,1,2,3,4]" }] },
+    { order: 20, title: "4Sum", difficulty: "MEDIUM", category: "Two Pointers", description: "Given an array nums of n integers, return an array of all the unique quadruplets [nums[a], nums[b], nums[c], nums[d]].", starterCode: "var fourSum = function(nums, target) {\n    \n};", testCases: [{ input: "[1,0,-1,0,-2,2]\n0", expectedOutput: "[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]" }] },
 
-    // --- TOPIC 3: MATH ---
-    {
-      order: 40, title: "Add Binary", difficulty: "EASY", category: "Math",
-      description: "Given two binary strings a and b, return their sum as a binary string.",
-      starterCode: "var addBinary = function(a, b) {\n    \n};",
-      testCases: [{ input: "\"11\"\n\"1\"", expectedOutput: "\"100\"" }]
-    },
-    {
-      order: 41, title: "Sqrt(x)", difficulty: "EASY", category: "Math",
-      description: "Given a non-negative integer x, compute and return the square root of x.",
-      starterCode: "var mySqrt = function(x) {\n    \n};",
-      testCases: [{ input: "4", expectedOutput: "2" }, { input: "8", expectedOutput: "2" }]
-    },
-    {
-      order: 42, title: "Happy Number", difficulty: "EASY", category: "Math",
-      description: "Write an algorithm to determine if a number n is happy.",
-      starterCode: "var isHappy = function(n) {\n    \n};",
-      testCases: [{ input: "19", expectedOutput: "true" }]
-    },
-    {
-      order: 43, title: "Count Primes", difficulty: "MEDIUM", category: "Math",
-      description: "Count the number of prime numbers less than a non-negative number, n.",
-      starterCode: "var countPrimes = function(n) {\n    \n};",
-      testCases: [{ input: "10", expectedOutput: "4" }]
-    },
-    {
-      order: 44, title: "Power of Three", difficulty: "EASY", category: "Math",
-      description: "Given an integer n, return true if it is a power of three. Otherwise, return false.",
-      starterCode: "var isPowerOfThree = function(n) {\n    \n};",
-      testCases: [{ input: "27", expectedOutput: "true" }]
-    },
-    {
-      order: 45, title: "Integer to Roman", difficulty: "MEDIUM", category: "Math",
-      description: "Seven different symbols represent Roman numerals. Given an integer, convert it to a Roman numeral.",
-      starterCode: "var intToRoman = function(num) {\n    \n};",
-      testCases: [{ input: "3", expectedOutput: "\"III\"" }]
-    },
-    {
-      order: 46, title: "Max Points on a Line", difficulty: "HARD", category: "Math",
-      description: "Given an array of points where points[i] = [xi, yi], return the maximum number of points that lie on the same straight line.",
-      starterCode: "var maxPoints = function(points) {\n    \n};",
-      testCases: [{ input: "[[1,1],[2,2],[3,3]]", expectedOutput: "3" }]
-    },
-    {
-      order: 47, title: "Divide Two Integers", difficulty: "MEDIUM", category: "Math",
-      description: "Given two integers dividend and divisor, divide two integers without using multiplication, division, and mod operator.",
-      starterCode: "var divide = function(dividend, divisor) {\n    \n};",
-      testCases: [{ input: "10\n3", expectedOutput: "3" }]
-    },
-    {
-      order: 48, title: "Roman to Integer", difficulty: "EASY", category: "Math",
-      description: "Convert a Roman numeral string to an integer.",
-      starterCode: "var romanToInt = function(s) {\n    \n};",
-      testCases: [{ input: "\"LVIII\"", expectedOutput: "58" }]
-    },
-    {
-      order: 49, title: "Valid Square", difficulty: "MEDIUM", category: "Math",
-      description: "Given the coordinates of four points in 2D space, return true if the four points form a square.",
-      starterCode: "var validSquare = function(p1, p2, p3, p4) {\n    \n};",
-      testCases: [{ input: "[0,0]\n[1,1]\n[1,0]\n[0,1]", expectedOutput: "true" }]
-    },
+    // --- 3. STACK (21-30) ---
+    { order: 21, title: "Valid Parentheses", difficulty: "EASY", category: "Stack", description: "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.", starterCode: "var isValid = function(s) {\n    \n};", testCases: [{ input: "\"()[]{}\"", expectedOutput: "true" }] },
+    { order: 22, title: "Min Stack", difficulty: "MEDIUM", category: "Stack", description: "Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.", starterCode: "var MinStack = function() {};", testCases: [{ input: "[\"MinStack\",\"push\",\"push\",\"push\",\"getMin\",\"pop\",\"top\",\"getMin\"]\n[[],[-2],[0],[-3],[],[],[],[]]", expectedOutput: "[null,null,null,null,-3,null,0,-2]" }] },
+    { order: 23, title: "Evaluate Reverse Polish Notation", difficulty: "MEDIUM", category: "Stack", description: "Evaluate the value of an arithmetic expression in Reverse Polish Notation.", starterCode: "var evalRPN = function(tokens) {\n    \n};", testCases: [{ input: "[\"2\",\"1\",\"+\",\"3\",\"*\"]", expectedOutput: "9" }] },
+    { order: 24, title: "Generate Parentheses", difficulty: "MEDIUM", category: "Stack", description: "Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.", starterCode: "var generateParenthesis = function(n) {\n    \n};", testCases: [{ input: "3", expectedOutput: "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]" }] },
+    { order: 25, title: "Daily Temperatures", difficulty: "MEDIUM", category: "Stack", description: "Given an array of integers temperatures represents the daily temperatures, return an array answer such that answer[i] is the number of days you have to wait after the ith day to get a warmer temperature.", starterCode: "var dailyTemperatures = function(temperatures) {\n    \n};", testCases: [{ input: "[73,74,75,71,69,72,76,73]", expectedOutput: "[1,1,4,2,1,1,0,0]" }] },
+    { order: 26, title: "Car Fleet", difficulty: "MEDIUM", category: "Stack", description: "There are n cars going to the same destination along a one-lane road. The destination is target miles away.", starterCode: "var carFleet = function(target, position, speed) {\n    \n};", testCases: [{ input: "12\n[10,8,0,5,3]\n[2,4,1,1,3]", expectedOutput: "3" }] },
+    { order: 27, title: "Largest Rectangle in Histogram", difficulty: "HARD", category: "Stack", description: "Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.", starterCode: "var largestRectangleArea = function(heights) {\n    \n};", testCases: [{ input: "[2,1,5,6,2,3]", expectedOutput: "10" }] },
+    { order: 28, title: "Implement Queue using Stacks", difficulty: "EASY", category: "Stack", description: "Implement a first in first out (FIFO) queue using only two stacks.", starterCode: "var MyQueue = function() {};", testCases: [{ input: "[\"MyQueue\",\"push\",\"push\",\"peek\",\"pop\",\"empty\"]\n[[],[1],[2],[],[],[]]", expectedOutput: "[null,null,null,1,1,false]" }] },
+    { order: 29, title: "Decode String", difficulty: "MEDIUM", category: "Stack", description: "Given an encoded string, return its decoded string.", starterCode: "var decodeString = function(s) {\n    \n};", testCases: [{ input: "\"3[a]2[bc]\"", expectedOutput: "\"aaabcbc\"" }] },
+    { order: 30, title: "Asteroid Collision", difficulty: "MEDIUM", category: "Stack", description: "We are given an array asteroids of integers representing asteroids in a row. Find out the state of the asteroids after all collisions.", starterCode: "var asteroidCollision = function(asteroids) {\n    \n};", testCases: [{ input: "[5,10,-5]", expectedOutput: "[5,10]" }] },
 
-    // --- TOPIC 4: DYNAMIC PROGRAMMING ---
-    {
-      order: 50, title: "House Robber", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.",
-      starterCode: "var rob = function(nums) {\n    \n};",
-      testCases: [{ input: "[1,2,3,1]", expectedOutput: "4" }]
-    },
-    {
-      order: 51, title: "Coin Change", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.",
-      starterCode: "var coinChange = function(coins, amount) {\n    \n};",
-      testCases: [{ input: "[1,2,5]\n11", expectedOutput: "3" }]
-    },
-    {
-      order: 52, title: "Longest Increase Subsequence", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "Given an integer array nums, return the length of the longest strictly increasing subsequence.",
-      starterCode: "var lengthOfLIS = function(nums) {\n    \n};",
-      testCases: [{ input: "[10,9,2,5,3,7,101,18]", expectedOutput: "4" }]
-    },
-    {
-      order: 53, title: "Word Break", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.",
-      starterCode: "var wordBreak = function(s, wordDict) {\n    \n};",
-      testCases: [{ input: "\"leetcode\"\n[\"leet\",\"code\"]", expectedOutput: "true" }]
-    },
-    {
-      order: 54, title: "Unique Paths", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "There is a robot on an m x n grid. The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid.",
-      starterCode: "var uniquePaths = function(m, n) {\n    \n};",
-      testCases: [{ input: "3\n7", expectedOutput: "28" }]
-    },
-    {
-      order: 55, title: "Maximum Product Subarray", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "Given an integer array nums, find a contiguous non-empty subarray within the array that has the largest product, and return the product.",
-      starterCode: "var maxProduct = function(nums) {\n    \n};",
-      testCases: [{ input: "[2,3,-2,4]", expectedOutput: "6" }]
-    },
-    {
-      order: 56, title: "Trapping Rain Water", difficulty: "HARD", category: "Dynamic Programming",
-      description: "Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.",
-      starterCode: "var trap = function(height) {\n    \n};",
-      testCases: [{ input: "[0,1,0,2,1,0,1,3,2,1,2,1]", expectedOutput: "6" }]
-    },
-    {
-      order: 57, title: "Longest Common Subsequence", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "Given two strings text1 and text2, return the length of their longest common subsequence.",
-      starterCode: "var longestCommonSubsequence = function(text1, text2) {\n    \n};",
-      testCases: [{ input: "\"abcde\"\n\"ace\"", expectedOutput: "3" }]
-    },
-    {
-      order: 58, title: "Edit Distance", difficulty: "HARD", category: "Dynamic Programming",
-      description: "Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.",
-      starterCode: "var minDistance = function(word1, word2) {\n    \n};",
-      testCases: [{ input: "\"horse\"\n\"ros\"", expectedOutput: "3" }]
-    },
-    {
-      order: 59, title: "Partition Equal Subset Sum", difficulty: "MEDIUM", category: "Dynamic Programming",
-      description: "Given a non-empty array nums containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.",
-      starterCode: "var canPartition = function(nums) {\n    \n};",
-      testCases: [{ input: "[1,5,11,5]", expectedOutput: "true" }]
-    }
-    // ... Additional problems generated below
-  ];
+    // --- 4. BINARY SEARCH (31-40) ---
+    { order: 31, title: "Binary Search", difficulty: "EASY", category: "Binary Search", description: "Given an array of integers nums which is sorted in ascending order, and an integer target, write a function to search target in nums.", starterCode: "var search = function(nums, target) {\n    \n};", testCases: [{ input: "[-1,0,3,5,9,12]\n9", expectedOutput: "4" }] },
+    { order: 32, title: "Search a 2D Matrix", difficulty: "MEDIUM", category: "Binary Search", description: "Write an efficient algorithm that searches for a value target in an m x n integer matrix matrix.", starterCode: "var searchMatrix = function(matrix, target) {\n    \n};", testCases: [{ input: "[[1,3,5,7],[10,11,16,20],[23,30,34,60]]\n3", expectedOutput: "true" }] },
+    { order: 33, title: "Koko Eating Bananas", difficulty: "MEDIUM", category: "Binary Search", description: "Koko loves to eat bananas. There are n piles of bananas, the ith pile has piles[i] bananas. Return the minimum integer k such that she can eat all the bananas within h hours.", starterCode: "var minEatingSpeed = function(piles, h) {\n    \n};", testCases: [{ input: "[3,6,7,11]\n8", expectedOutput: "4" }] },
+    { order: 34, title: "Find Minimum in Rotated Sorted Array", difficulty: "MEDIUM", category: "Binary Search", description: "Given the sorted rotated array nums of unique elements, return the minimum element of this array.", starterCode: "var findMin = function(nums) {\n    \n};", testCases: [{ input: "[3,4,5,1,2]", expectedOutput: "1" }] },
+    { order: 35, title: "Search in Rotated Sorted Array", difficulty: "MEDIUM", category: "Binary Search", description: "Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.", starterCode: "var search = function(nums, target) {\n    \n};", testCases: [{ input: "[4,5,6,7,0,1,2]\n0", expectedOutput: "4" }] },
+    { order: 36, title: "Time Based Key-Value Store", difficulty: "MEDIUM", category: "Binary Search", description: "Design a time-based key-value data structure that can store multiple values for the same key at different time stamps and retrieve the key's value at a certain timestamp.", starterCode: "var TimeMap = function() {};", testCases: [{ input: "[\"TimeMap\",\"set\",\"get\",\"get\",\"set\",\"get\",\"get\"]\n[[],[\"foo\",\"bar\",1],[\"foo\",1],[\"foo\",3],[\"foo\",\"bar2\",4],[\"foo\",4],[\"foo\",5]]", expectedOutput: "[null,null,\"bar\",\"bar\",null,\"bar2\",\"bar2\"]" }] },
+    { order: 37, title: "Median of Two Sorted Arrays", difficulty: "HARD", category: "Binary Search", description: "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.", starterCode: "var findMedianSortedArrays = function(nums1, nums2) {\n    \n};", testCases: [{ input: "[1,3]\n[2]", expectedOutput: "2.00000" }] },
+    { order: 38, title: "First Bad Version", difficulty: "EASY", category: "Binary Search", description: "You are a product manager and currently leading a team to develop a new product. Find the first bad version.", starterCode: "var solution = function(isBadVersion) {\n    return function(n) {\n        \n    };\n};", testCases: [{ input: "5\n4", expectedOutput: "4" }] },
+    { order: 39, title: "Valid Perfect Square", difficulty: "EASY", category: "Binary Search", description: "Given a positive integer num, return true if num is a perfect square or false otherwise.", starterCode: "var isPerfectSquare = function(num) {\n    \n};", testCases: [{ input: "16", expectedOutput: "true" }] },
+    { order: 40, title: "Search Insert Position", difficulty: "EASY", category: "Binary Search", description: "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.", starterCode: "var searchInsert = function(nums, target) {\n    \n};", testCases: [{ input: "[1,3,5,6]\n5", expectedOutput: "2" }] },
 
-  // Topic extensions helpers
-  const categories = ["Two Pointers", "Trees", "Hashing", "Binary Search", "Linked List", "Stack & Queue"];
-  const startOrder = 60;
-  
-  for (let i = 0; i < categories.length; i++) {
-    const category = categories[i];
-    for (let j = 0; j < 10; j++) {
-      const order = startOrder + (i * 10) + j;
-      const difficulty = j < 3 ? "EASY" : j < 7 ? "MEDIUM" : "HARD";
-      problems.push({
-        order,
-        title: `${category} Problem ${j + 1}`,
-        difficulty: difficulty as any,
-        category,
-        description: `This is a sample ${difficulty.toLowerCase()} problem for the ${category} category. Solve it to improve your skills!`,
-        starterCode: `// ${category} Problem ${j + 1} Starter Code\nfunction solution() {\n  // write code here\n}`,
-        testCases: [{ input: "test", expectedOutput: "result" }]
+    // --- 5. LINKED LIST (41-50) ---
+    { order: 41, title: "Reverse Linked List", difficulty: "EASY", category: "Linked List", description: "Given the head of a singly linked list, reverse the list, and return the reversed list.", starterCode: "var reverseList = function(head) {\n    \n};", testCases: [{ input: "[1,2,3,4,5]", expectedOutput: "[5,4,3,2,1]" }] },
+    { order: 42, title: "Merge Two Sorted Lists", difficulty: "EASY", category: "Linked List", description: "You are given the heads of two sorted linked lists list1 and list2. Merge the two lists into one sorted list.", starterCode: "var mergeTwoLists = function(list1, list2) {\n    \n};", testCases: [{ input: "[1,2,4]\n[1,3,4]", expectedOutput: "[1,1,2,3,4,4]" }] },
+    { order: 43, title: "Reorder List", difficulty: "MEDIUM", category: "Linked List", description: "You are given the head of a singly linked-list. The list can be represented as: L0 → L1 → … → Ln - 1 → Ln. Reorder the list to be on the following form: L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …", starterCode: "var reorderList = function(head) {\n    \n};", testCases: [{ input: "[1,2,3,4]", expectedOutput: "[1,4,2,3]" }] },
+    { order: 44, title: "Remove Nth Node From End of List", difficulty: "MEDIUM", category: "Linked List", description: "Given the head of a linked list, remove the nth node from the end of the list and return its head.", starterCode: "var removeNthFromEnd = function(head, n) {\n    \n};", testCases: [{ input: "[1,2,3,4,5]\n2", expectedOutput: "[1,2,3,5]" }] },
+    { order: 45, title: "Copy List with Random Pointer", difficulty: "MEDIUM", category: "Linked List", description: "A linked list of length n is given such that each node contains an additional random pointer, which could point to any node in the list, or null. Construct a deep copy of the list.", starterCode: "var copyRandomList = function(head) {\n    \n};", testCases: [{ input: "[[7,null],[13,0],[11,4],[10,2],[1,0]]", expectedOutput: "[[7,null],[13,0],[11,4],[10,2],[1,0]]" }] },
+    { order: 46, title: "Add Two Numbers", difficulty: "MEDIUM", category: "Linked List", description: "You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order.", starterCode: "var addTwoNumbers = function(l1, l2) {\n    \n};", testCases: [{ input: "[2,4,3]\n[5,6,4]", expectedOutput: "[7,0,8]" }] },
+    { order: 47, title: "Linked List Cycle", difficulty: "EASY", category: "Linked List", description: "Given head, the head of a linked list, determine if the linked list has a cycle in it.", starterCode: "var hasCycle = function(head) {\n    \n};", testCases: [{ input: "[3,2,0,-4]\n1", expectedOutput: "true" }] },
+    { order: 48, title: "Find the Duplicate Number", difficulty: "MEDIUM", category: "Linked List", description: "Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive. There is only one repeated number in nums, return this repeated number.", starterCode: "var findDuplicate = function(nums) {\n    \n};", testCases: [{ input: "[1,3,4,2,2]", expectedOutput: "2" }] },
+    { order: 49, title: "LRU Cache", difficulty: "MEDIUM", category: "Linked List", description: "Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.", starterCode: "var LRUCache = function(capacity) {};", testCases: [{ input: "[\"LRUCache\", \"put\", \"put\", \"get\", \"put\", \"get\", \"put\", \"get\"]\n[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1]]", expectedOutput: "[null, null, null, 1, null, -1, null, -1]" }] },
+    { order: 50, title: "Merge k Sorted Lists", difficulty: "HARD", category: "Linked List", description: "You are given an array of k linked-lists lists, each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return it.", starterCode: "var mergeKLists = function(lists) {\n    \n};", testCases: [{ input: "[[1,4,5],[1,3,4],[2,6]]", expectedOutput: "[1,1,2,3,4,4,5,6]" }] },
+
+    // --- 6. TREES (51-60) ---
+    { order: 51, title: "Invert Binary Tree", difficulty: "EASY", category: "Trees", description: "Given the root of a binary tree, invert the tree, and return its root.", starterCode: "var invertTree = function(root) {\n    \n};", testCases: [{ input: "[4,2,7,1,3,6,9]", expectedOutput: "[4,7,2,9,6,3,1]" }] },
+    { order: 52, title: "Maximum Depth of Binary Tree", difficulty: "EASY", category: "Trees", description: "Given the root of a binary tree, return its maximum depth.", starterCode: "var maxDepth = function(root) {\n    \n};", testCases: [{ input: "[3,9,20,null,null,15,7]", expectedOutput: "3" }] },
+    { order: 53, title: "Diameter of Binary Tree", difficulty: "EASY", category: "Trees", description: "Given the root of a binary tree, return the length of the diameter of the tree.", starterCode: "var diameterOfBinaryTree = function(root) {\n    \n};", testCases: [{ input: "[1,2,3,4,5]", expectedOutput: "3" }] },
+    { order: 54, title: "Balanced Binary Tree", difficulty: "EASY", category: "Trees", description: "Given a binary tree, determine if it is height-balanced.", starterCode: "var isBalanced = function(root) {\n    \n};", testCases: [{ input: "[3,9,20,null,null,15,7]", expectedOutput: "true" }] },
+    { order: 55, title: "Same Tree", difficulty: "EASY", category: "Trees", description: "Given the roots of two binary trees p and q, write a function to check if they are the same or not.", starterCode: "var isSameTree = function(p, q) {\n    \n};", testCases: [{ input: "[1,2,3]\n[1,2,3]", expectedOutput: "true" }] },
+    { order: 56, title: "Subtree of Another Tree", difficulty: "EASY", category: "Trees", description: "Given the roots of two binary trees root and subRoot, return true if there is a subtree of root with the same structure and node values of subRoot and false otherwise.", starterCode: "var isSubtree = function(root, subRoot) {\n    \n};", testCases: [{ input: "[3,4,5,1,2]\n[4,1,2]", expectedOutput: "true" }] },
+    { order: 57, title: "Lowest Common Ancestor of a Binary Search Tree", difficulty: "MEDIUM", category: "Trees", description: "Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.", starterCode: "var lowestCommonAncestor = function(root, p, q) {\n    \n};", testCases: [{ input: "[6,2,8,0,4,7,9,null,null,3,5]\n2\n8", expectedOutput: "6" }] },
+    { order: 58, title: "Binary Tree Level Order Traversal", difficulty: "MEDIUM", category: "Trees", description: "Given the root of a binary tree, return the level order traversal of its nodes' values.", starterCode: "var levelOrder = function(root) {\n    \n};", testCases: [{ input: "[3,9,20,null,null,15,7]", expectedOutput: "[[3],[9,20],[15,7]]" }] },
+    { order: 59, title: "Validate Binary Search Tree", difficulty: "MEDIUM", category: "Trees", description: "Given the root of a binary tree, determine if it is a valid binary search tree (BST).", starterCode: "var isValidBST = function(root) {\n    \n};", testCases: [{ input: "[2,1,3]", expectedOutput: "true" }] },
+    { order: 60, title: "Kth Smallest Element in a BST", difficulty: "MEDIUM", category: "Trees", description: "Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.", starterCode: "var kthSmallest = function(root, k) {\n    \n};", testCases: [{ input: "[3,1,4,null,2]\n1", expectedOutput: "1" }] },
+
+    // --- 7. HEAP / PRIORITY QUEUE (61-70) ---
+    { order: 61, title: "Kth Largest Element in a Stream", difficulty: "EASY", category: "Heap", description: "Design a class to find the kth largest element in a stream.", starterCode: "var KthLargest = function(k, nums) {};", testCases: [{ input: "[\"KthLargest\", \"add\", \"add\", \"add\", \"add\", \"add\"]\n[[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]", expectedOutput: "[null, 4, 5, 5, 8, 8]" }] },
+    { order: 62, title: "Last Stone Weight", difficulty: "EASY", category: "Heap", description: "You are given an array of integers stones. Return the weight of the last remaining stone.", starterCode: "var lastStoneWeight = function(stones) {\n    \n};", testCases: [{ input: "[2,7,4,1,8,1]", expectedOutput: "1" }] },
+    { order: 63, title: "K Closest Points to Origin", difficulty: "MEDIUM", category: "Heap", description: "Given an array of points where points[i] = [xi, yi], return the k closest points to the origin (0, 0).", starterCode: "var kClosest = function(points, k) {\n    \n};", testCases: [{ input: "[[1,3],[-2,2]]\n1", expectedOutput: "[[-2,2]]" }] },
+    { order: 64, title: "Kth Largest Element in an Array", difficulty: "MEDIUM", category: "Heap", description: "Given an integer array nums and an integer k, return the kth largest element in the array.", starterCode: "var findKthLargest = function(nums, k) {\n    \n};", testCases: [{ input: "[3,2,1,5,6,4]\n2", expectedOutput: "5" }] },
+    { order: 65, title: "Task Scheduler", difficulty: "MEDIUM", category: "Heap", description: "Given a characters array tasks, return the least number of units of time that the CPU will take to finish all the given tasks.", starterCode: "var leastInterval = function(tasks, n) {\n    \n};", testCases: [{ input: "[\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"]\n2", expectedOutput: "8" }] },
+    { order: 66, title: "Design Twitter", difficulty: "MEDIUM", category: "Heap", description: "Design a simplified version of Twitter where users can post tweets, follow/unfollow another user, and see the 10 most recent tweets in the user's news feed.", starterCode: "var Twitter = function() {};", testCases: [{ input: "[\"Twitter\", \"postTweet\", \"getNewsFeed\", \"follow\", \"postTweet\", \"getNewsFeed\", \"unfollow\", \"getNewsFeed\"]\n[[], [1, 5], [1], [1, 2], [2, 6], [1], [1, 2], [1]]", expectedOutput: "[null, null, [5], null, null, [6, 5], null, [5]]" }] },
+    { order: 67, title: "Find Median from Data Stream", difficulty: "HARD", category: "Heap", description: "The median is the middle value in an ordered integer list. Implement the MedianFinder class.", starterCode: "var MedianFinder = function() {};", testCases: [{ input: "[\"MedianFinder\", \"addNum\", \"addNum\", \"findMedian\", \"addNum\", \"findMedian\"]\n[[], [1], [2], [], [3], []]", expectedOutput: "[null, null, null, 1.5, null, 2.0]" }] },
+
+    // --- 8. GRAPHS (81-90) ---
+    { order: 81, title: "Number of Islands", difficulty: "MEDIUM", category: "Graphs", description: "Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.", starterCode: "var numIslands = function(grid) {\n    \n};", testCases: [{ input: "[[\"1\",\"1\",\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"0\",\"0\"]]", expectedOutput: "1" }] },
+    { order: 82, title: "Max Area of Island", difficulty: "MEDIUM", category: "Graphs", description: "You are given an m x n binary matrix grid. An island is a group of 1s (representing land). Return the maximum area of an island in grid.", starterCode: "var maxAreaOfIsland = function(grid) {\n    \n};", testCases: [{ input: "[[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]]", expectedOutput: "6" }] },
+    { order: 83, title: "Clone Graph", difficulty: "MEDIUM", category: "Graphs", description: "Given a reference of a node in a connected undirected graph. Return a deep copy (clone) of the graph.", starterCode: "var cloneGraph = function(node) {\n    \n};", testCases: [{ input: "[[2,4],[1,3],[2,4],[1,3]]", expectedOutput: "[[2,4],[1,3],[2,4],[1,3]]" }] },
+    { order: 84, title: "Rotting Oranges", difficulty: "MEDIUM", category: "Graphs", description: "You are given an m x n grid where each cell can have one of three values: 0 (empty), 1 (fresh), 2 (rotten). Return the minimum number of minutes that must elapse until no cell has a fresh orange.", starterCode: "var orangesRotting = function(grid) {\n    \n};", testCases: [{ input: "[[2,1,1],[1,1,0],[0,1,1]]", expectedOutput: "4" }] },
+    { order: 85, title: "Pacific Atlantic Water Flow", difficulty: "MEDIUM", category: "Graphs", description: "There is an m x n rectangular island that borders both the Pacific Ocean and Atlantic Ocean. Return a list of grid coordinates where water can flow to both.", starterCode: "var pacificAtlantic = function(heights) {\n    \n};", testCases: [{ input: "[[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]", expectedOutput: "[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]" }] },
+    { order: 86, title: "Surrounded Regions", difficulty: "MEDIUM", category: "Graphs", description: "Given an m x n matrix board containing 'X' and 'O', capture all regions that are 4-directionally surrounded by 'X'.", starterCode: "var solve = function(board) {\n    \n};", testCases: [{ input: "[[\"X\",\"X\",\"X\",\"X\"],[\"X\",\"O\",\"O\",\"X\"],[\"X\",\"X\",\"O\",\"X\"],[\"X\",\"O\",\"X\",\"X\"]]", expectedOutput: "[[\"X\",\"X\",\"X\",\"X\"],[\"X\",\"X\",\"X\",\"X\"],[\"X\",\"X\",\"X\",\"X\"],[\"X\",\"O\",\"X\",\"X\"]]" }] },
+    { order: 87, title: "Course Schedule", difficulty: "MEDIUM", category: "Graphs", description: "There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites. Return true if you can finish all courses.", starterCode: "var canFinish = function(numCourses, prerequisites) {\n    \n};", testCases: [{ input: "2\n[[1,0]]", expectedOutput: "true" }] },
+    { order: 88, title: "Course Schedule II", difficulty: "MEDIUM", category: "Graphs", description: "Return the ordering of courses you should take to finish all courses. If there are many valid answers, return any of them.", starterCode: "var findOrder = function(numCourses, prerequisites) {\n    \n};", testCases: [{ input: "2\n[[1,0]]", expectedOutput: "[0,1]" }] },
+    { order: 89, title: "Redundant Connection", difficulty: "MEDIUM", category: "Graphs", description: "Return an edge that can be removed so that the resulting graph is a tree of n nodes.", starterCode: "var findRedundantConnection = function(edges) {\n    \n};", testCases: [{ input: "[[1,2],[1,3],[2,3]]", expectedOutput: "[2,3]" }] },
+    { order: 90, title: "Word Ladder", difficulty: "HARD", category: "Graphs", description: "Return the length of the shortest transformation sequence from beginWord to endWord.", starterCode: "var ladderLength = function(beginWord, endWord, wordList) {\n    \n};", testCases: [{ input: "\"hit\"\n\"cog\"\n[\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]", expectedOutput: "5" }] },
+
+    // --- 9. DYNAMIC PROGRAMMING (91-100) ---
+    { order: 91, title: "Climbing Stairs", difficulty: "EASY", category: "Dynamic Programming", description: "You are climbing a staircase. It takes n steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?", starterCode: "var climbStairs = function(n) {\n    \n};", testCases: [{ input: "2", expectedOutput: "2" }] },
+    { order: 92, title: "Min Cost Climbing Stairs", difficulty: "EASY", category: "Dynamic Programming", description: "Return the minimum cost to reach the top of the floor.", starterCode: "var minCostClimbingStairs = function(cost) {\n    \n};", testCases: [{ input: "[10,15,20]", expectedOutput: "15" }] },
+    { order: 93, title: "House Robber", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Return the maximum amount of money you can rob tonight without alerting the police.", starterCode: "var rob = function(nums) {\n    \n};", testCases: [{ input: "[1,2,3,1]", expectedOutput: "4" }] },
+    { order: 94, title: "House Robber II", difficulty: "MEDIUM", category: "Dynamic Programming", description: "All houses at this place are arranged in a circle. Return the maximum amount of money you can rob.", starterCode: "var rob = function(nums) {\n    \n};", testCases: [{ input: "[2,3,2]", expectedOutput: "3" }] },
+    { order: 95, title: "Longest Palindromic Substring", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Given a string s, return the longest palindromic substring in s.", starterCode: "var longestPalindrome = function(s) {\n    \n};", testCases: [{ input: "\"babad\"", expectedOutput: "\"bab\"" }] },
+    { order: 96, title: "Palindromic Substrings", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Given a string s, return the number of palindromic substrings in it.", starterCode: "var countSubstrings = function(s) {\n    \n};", testCases: [{ input: "\"abc\"", expectedOutput: "3" }] },
+    { order: 97, title: "Decode Ways", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Given a string s containing only digits, return the number of ways to decode it.", starterCode: "var numDecodings = function(s) {\n    \n};", testCases: [{ input: "\"12\"", expectedOutput: "2" }] },
+    { order: 98, title: "Coin Change", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Return the fewest number of coins that you need to make up that amount.", starterCode: "var coinChange = function(coins, amount) {\n    \n};", testCases: [{ input: "[1,2,5]\n11", expectedOutput: "3" }] },
+    { order: 99, title: "Maximum Product Subarray", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Find a contiguous non-empty subarray within the array that has the largest product, and return the product.", starterCode: "var maxProduct = function(nums) {\n    \n};", testCases: [{ input: "[2,3,-2,4]", expectedOutput: "6" }] },
+    { order: 100, title: "Word Break", difficulty: "MEDIUM", category: "Dynamic Programming", description: "Return true if s can be segmented into a space-separated sequence of one or more dictionary words.", starterCode: "var wordBreak = function(s, wordDict) {\n    \n};", testCases: [{ input: "\"leetcode\"\n[\"leet\",\"code\"]", expectedOutput: "true" }] }
+    ];
+
+    for (const p of problems) {
+      await prisma.problem.upsert({
+        where: { order: p.order },
+        update: {
+          title: p.title,
+          description: p.description,
+          difficulty: p.difficulty as any,
+          category: p.category,
+          starterCode: p.starterCode,
+          testCases: {
+            deleteMany: {},
+            create: p.testCases
+          }
+        },
+        create: {
+          title: p.title,
+          description: p.description,
+          difficulty: p.difficulty as any,
+          category: p.category,
+          order: p.order,
+          starterCode: p.starterCode,
+          solutionCode: "// Solution",
+          testCases: {
+            create: p.testCases
+          }
+        }
       });
     }
-  }
-
-  // Final Topics to reach ~120 total problems
-  const extraCategories = ["Graphs", "Backtracking", "Heap", "Sliding Window"];
-  const extraStart = startOrder + (categories.length * 10); // 60 + 60 = 120
-
-  for (let i = 0; i < extraCategories.length; i++) {
-    const category = extraCategories[i];
-    for (let j = 0; j < 5; j++) {
-      const order = extraStart + (i * 5) + j;
-       const difficulty = j < 2 ? "EASY" : j < 4 ? "MEDIUM" : "HARD";
-       problems.push({
-        order,
-        title: `${category} Problem ${j + 1}`,
-        difficulty: difficulty as any,
-        category,
-        description: `Improve your ${category} skills with this ${difficulty.toLowerCase()} challenge.`,
-        starterCode: `// ${category} Problem ${j + 1}\nfunction solve() {\n}`,
-        testCases: [{ input: "input", expectedOutput: "output" }]
-      });
-    }
-  }
-
-  for (const p of problems) {
-    await prisma.problem.upsert({
-      where: { order: p.order },
-      update: {
-        title: p.title,
-        description: p.description,
-        difficulty: p.difficulty as any,
-        category: p.category,
-        starterCode: p.starterCode,
-        testCases: {
-          deleteMany: {},
-          create: p.testCases
-        }
-      },
-      create: {
-        title: p.title,
-        description: p.description,
-        difficulty: p.difficulty as any,
-        category: p.category,
-        order: p.order,
-        starterCode: p.starterCode,
-        solutionCode: "// Solution template",
-        testCases: {
-          create: p.testCases
-        }
-      }
-    });
-  }
 
     return NextResponse.json({ message: "Seeding complete", count: problems.length });
   } catch(e: any) {
