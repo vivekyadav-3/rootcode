@@ -56,8 +56,11 @@ export async function submitCode(formData: FormData) {
     let totalMemory = 0;
     
     // Check if we are using Piston (Vercel) or Judge0 (Local)
-    const usePiston = !!process.env.PISTON_API_URL;
+    const pistonUrl = process.env.PISTON_API_URL ? process.env.PISTON_API_URL.replace(/\/$/, "") : "";
+    const usePiston = !!pistonUrl;
     const pistonConfig = pistonLanguages[languageId];
+
+    console.log(`[Submission] UsePiston: ${usePiston} (URL: ${pistonUrl || "N/A"}), Language: ${languageId}, ConfigFound: ${!!pistonConfig}`);
 
     // 3. Run test cases
     for (const testCase of problem.testCases) {
@@ -68,36 +71,48 @@ export async function submitCode(formData: FormData) {
 
         if (usePiston && pistonConfig) {
              // Execute with Piston (Free)
-             const response = await fetch(`${process.env.PISTON_API_URL}/execute`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    language: pistonConfig.language,
-                    version: pistonConfig.version,
-                    files: [
-                        {
-                            content: wrappedCode
-                        }
-                    ],
-                    stdin: testCase.input,
-                }),
-             });
+             console.log(`[Submission] Executing via Piston: ${pistonUrl}/execute`);
+             try {
+                const response = await fetch(`${pistonUrl}/execute`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        language: pistonConfig.language,
+                        version: pistonConfig.version,
+                        files: [
+                            {
+                                content: wrappedCode
+                            }
+                        ],
+                        stdin: testCase.input,
+                    }),
+                });
 
-             if (!response.ok) {
-                 throw new Error(`Piston API Error: ${response.status} ${await response.text()}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`[Submission] Piston Error: ${response.status} - ${errorText}`);
+                    throw new Error(`Piston API Error: ${response.status} ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log("[Submission] Piston Response:", JSON.stringify(data).substring(0, 200) + "...");
+                
+                // Map Piston response to Judge0-like format
+                result = {
+                    stdout: data.run.stdout,
+                    stderr: data.run.stderr,
+                    compile_output: data.compile?.stderr || "",
+                    time: "0.01",
+                    memory: "0",
+                    status: {
+                        id: data.run.code === 0 ? 3 : 6,
+                        description: data.run.code === 0 ? "Accepted" : "Runtime Error"
+                    }
+                };
+             } catch (err) {
+                 console.error("[Submission] Fetch Failed:", err);
+                 throw err;
              }
-
-             const data = await response.json();
-             // Map Piston response to Judge0-like format for compatibility
-             result = {
-                 stdout: data.run.stdout,
-                 stderr: data.run.stderr,
-                 compile_output: data.compile?.stderr || "",
-                 time: "0.01", // Piston doesn't always return precise time in free tier
-                 memory: "0",
-                 status: {
-                     id: data.run.code === 0 ? 3 : 6, // 3=Accepted, 6=Error
-                     description: data.run.code === 0 ? "Accepted" : "Runtime Error"
                  }
              };
 
