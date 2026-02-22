@@ -18,6 +18,7 @@ export async function universalExecute(code: string, languageId: string, stdin: 
     const pistonConfig = pistonLanguages[languageId];
 
     console.log(`[Execution] Starting execution for: ${problemTitle || "Playground"}`);
+    const errors: string[] = [];
 
     // 1. Attempt Piston
     if (pistonConfig) {
@@ -32,7 +33,6 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                     files: [{ content: wrappedCode }],
                     stdin: stdin,
                 }),
-                signal: AbortSignal.timeout(10000), // 10s timeout
             });
 
             if (response.ok) {
@@ -50,9 +50,11 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                     }
                 };
             }
-            console.warn(`[Execution] Piston returned non-OK: ${response.status}`);
+            const errText = await response.text();
+            errors.push(`Piston (${response.status}): ${errText.substring(0, 100)}`);
         } catch (err: any) {
             console.error("[Execution] Piston Attempt Failed:", err.message);
+            errors.push(`Piston Error: ${err.message}`);
         }
     }
 
@@ -70,7 +72,6 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: params,
-                signal: AbortSignal.timeout(10000),
             });
 
             if (response.ok) {
@@ -88,9 +89,11 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                     }
                 };
             }
-            console.warn(`[Execution] CodeX returned non-OK: ${response.status}`);
+            const errText = await response.text();
+            errors.push(`CodeX (${response.status}): ${errText.substring(0, 100)}`);
         } catch (e: any) {
             console.error("[Execution] CodeX Attempt Failed:", e.message);
+            errors.push(`CodeX Error: ${e.message}`);
         }
     }
 
@@ -112,7 +115,6 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                 language_id: parseInt(languageId),
                 stdin: stdin,
             }),
-            signal: AbortSignal.timeout(15000),
         });
 
         if (response.ok) {
@@ -120,9 +122,12 @@ export async function universalExecute(code: string, languageId: string, stdin: 
             console.log("[Execution] Judge0 success");
             return res;
         }
+        const errText = await response.text();
+        errors.push(`Judge0 (${response.status}): ${errText.substring(0, 100)}`);
     } catch (e: any) {
         console.error("[Execution] Judge0 Attempt Failed:", e.message);
+        errors.push(`Judge0 Error: ${e.message}`);
     }
 
-    throw new Error("All execution services failed. Ensure PISTON_API_URL or JUDGE0_API_KEY are configured in Vercel.");
+    throw new Error(`All execution services failed.\nDetails:\n- ${errors.join('\n- ')}`);
 }
