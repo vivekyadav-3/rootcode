@@ -63,11 +63,12 @@ export async function POST(req: Request) {
     
     // 2. Call the new generateContent method
     const response = await client.models.generateContent({
-      model: "gemini-2.0-flash", // Using the robust 2.0 Flash model
+      model: "gemini-2.0-flash-lite", // Using lite for faster, more reliable responses
       contents: [...history, ...chatHistory, { role: "user", parts: [{ text: lastMessage }] }]
     });
 
-    const text = response.text();
+    // Check if response and text property exist (Safe for TypeScript)
+    const text = response.text || "I apologize, but I couldn't generate a response at this moment. Please try again.";
     
     console.log("AI Chat: Gemini response success");
     return NextResponse.json({ message: text });
