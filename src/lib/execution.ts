@@ -12,13 +12,17 @@ const pistonLanguages: Record<string, { language: string, version: string }> = {
 
 export async function universalExecute(code: string, languageId: string, stdin: string, problemTitle?: string) {
     const wrappedCode = problemTitle ? wrapCode(code, languageId, problemTitle) : code;
-    const pistonUrl = process.env.PISTON_API_URL ? process.env.PISTON_API_URL.replace(/\/$/, "") : "";
-    const usePiston = !!pistonUrl;
+    
+    // Default to public Piston API if env var is missing
+    const pistonUrl = (process.env.PISTON_API_URL || "https://emkc.org/api/v2/piston").replace(/\/$/, "");
     const pistonConfig = pistonLanguages[languageId];
 
+    console.log(`[Execution] Starting execution for: ${problemTitle || "Playground"}`);
+
     // 1. Attempt Piston
-    if (usePiston && pistonConfig) {
+    if (pistonConfig) {
         try {
+            console.log(`[Execution] Attempting Piston at ${pistonUrl}...`);
             const response = await fetch(`${pistonUrl}/execute`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -28,10 +32,12 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                     files: [{ content: wrappedCode }],
                     stdin: stdin,
                 }),
+                signal: AbortSignal.timeout(10000), // 10s timeout
             });
 
             if (response.ok) {
                 const data = await response.json();
+                console.log("[Execution] Piston success");
                 return {
                     stdout: data.run.stdout,
                     stderr: data.run.stderr,
@@ -44,8 +50,9 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                     }
                 };
             }
-        } catch (err) {
-            console.error("[Execution] Piston Failed:", err);
+            console.warn(`[Execution] Piston returned non-OK: ${response.status}`);
+        } catch (err: any) {
+            console.error("[Execution] Piston Attempt Failed:", err.message);
         }
     }
 
@@ -53,6 +60,7 @@ export async function universalExecute(code: string, languageId: string, stdin: 
     const codexLang = { "63": "js", "71": "py", "62": "java", "54": "cpp" }[languageId];
     if (codexLang) {
         try {
+            console.log("[Execution] Attempting CodeX Fallback...");
             const params = new URLSearchParams();
             params.append("code", wrappedCode);
             params.append("language", codexLang);
@@ -61,11 +69,13 @@ export async function universalExecute(code: string, languageId: string, stdin: 
             const response = await fetch("https://api.codex.jaagrav.in", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: params
+                body: params,
+                signal: AbortSignal.timeout(10000),
             });
 
             if (response.ok) {
                 const data = await response.json();
+                console.log("[Execution] CodeX success");
                 return {
                     stdout: data.output || "",
                     stderr: data.error || "",
@@ -78,20 +88,23 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                     }
                 };
             }
-        } catch (e) {
-            console.error("[Execution] CodeX Failed:", e);
+            console.warn(`[Execution] CodeX returned non-OK: ${response.status}`);
+        } catch (e: any) {
+            console.error("[Execution] CodeX Attempt Failed:", e.message);
         }
     }
 
-    // 3. Last Resort: Judge0 (RapidAPI or Local)
+    // 3. Last Resort: Judge0
+    const judge0_url = process.env.JUDGE0_URL || "http://localhost:2358";
     try {
+        console.log(`[Execution] Attempting Judge0 at ${judge0_url}...`);
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (process.env.JUDGE0_API_KEY) {
             headers["X-RapidAPI-Key"] = process.env.JUDGE0_API_KEY;
             headers["X-RapidAPI-Host"] = process.env.JUDGE0_API_HOST || "judge0-ce.p.rapidapi.com";
         }
 
-        const response = await fetch(`${JUDGE0_URL}/submissions?wait=true`, {
+        const response = await fetch(`${judge0_url}/submissions?wait=true`, {
             method: "POST",
             headers,
             body: JSON.stringify({
@@ -99,14 +112,17 @@ export async function universalExecute(code: string, languageId: string, stdin: 
                 language_id: parseInt(languageId),
                 stdin: stdin,
             }),
+            signal: AbortSignal.timeout(15000),
         });
 
         if (response.ok) {
-            return await response.json();
+            const res = await response.json();
+            console.log("[Execution] Judge0 success");
+            return res;
         }
-    } catch (e) {
-        console.error("[Execution] Judge0 Failed:", e);
+    } catch (e: any) {
+        console.error("[Execution] Judge0 Attempt Failed:", e.message);
     }
 
-    throw new Error("All execution services failed. Please check your API configuration.");
+    throw new Error("All execution services failed. Ensure PISTON_API_URL or JUDGE0_API_KEY are configured in Vercel.");
 }
