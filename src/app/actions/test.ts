@@ -4,7 +4,7 @@ import { wrapCode } from "@/lib/code-execution";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
-const JUDGE0_URL = process.env.JUDGE0_URL || "http://localhost:2358";
+import { universalExecute } from "@/lib/execution";
 
 export async function testProblem(problemId: string, code: string, languageId: string, input: string) {
   const user = await currentUser();
@@ -16,26 +16,9 @@ export async function testProblem(problemId: string, code: string, languageId: s
 
   if (!problem) throw new Error("Problem not found");
 
-  const wrappedCode = wrapCode(code, languageId, problem.title);
-
   try {
-    const response = await fetch(`${JUDGE0_URL}/submissions?wait=true`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        source_code: wrappedCode,
-        language_id: parseInt(languageId),
-        stdin: input, // Use user provided input
-      }),
-    });
-
-    if (!response.ok) {
-        if (response.status === 404 || response.status === 502 || response.status === 503 || response.status === 500) {
-           // Fallback or specific validatoin
-        }
-    }
-
-    const result = await response.json();
+    const result = await universalExecute(code, languageId, input, problem.title);
+    
     return {
       status: result.status?.description || "Unknown",
       stdout: result.stdout || "",

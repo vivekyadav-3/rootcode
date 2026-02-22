@@ -4,8 +4,7 @@ import { wrapCode } from "@/lib/code-execution";
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-
-const JUDGE0_URL = process.env.JUDGE0_URL || "http://localhost:2358";
+import { universalExecute } from "@/lib/execution";
 
 export async function submitCode(formData: FormData) {
   try {
@@ -35,13 +34,7 @@ export async function submitCode(formData: FormData) {
 
     console.log(`🚀 Submitting problem ${problemId} in language ${languageId}`);
 
-    // Map Judge0 IDs to Piston languages
-    const pistonLanguages: Record<string, { language: string, version: string }> = {
-        "63": { language: "javascript", version: "18.15.0" },
-        "71": { language: "python", version: "3.10.0" },
-        "62": { language: "java", version: "15.0.2" },
-        "54": { language: "c++", version: "10.2.0" },
-    };
+    // Map Judge0 IDs to Piston languages for wrapCode (if needed in wrapCode)
 
     // 1. Get problem and test cases
     const problem = await prisma.problem.findUnique({
@@ -55,148 +48,21 @@ export async function submitCode(formData: FormData) {
     let totalRuntime = 0;
     let totalMemory = 0;
     
-    // Check if we are using Piston (Vercel) or Judge0 (Local)
-    const pistonUrl = process.env.PISTON_API_URL ? process.env.PISTON_API_URL.replace(/\/$/, "") : "";
-    const usePiston = !!pistonUrl;
-    const pistonConfig = pistonLanguages[languageId];
-
-    console.log(`[Submission] UsePiston: ${usePiston} (URL: ${pistonUrl || "N/A"}), Language: ${languageId}, ConfigFound: ${!!pistonConfig}`);
+    
 
     // 3. Run test cases
     for (const testCase of problem.testCases) {
-       // Wrap user code in a complete program
-        const wrappedCode = wrapCode(code, languageId, problem.title);
-        
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let result: any = {};
-
-        if (usePiston && pistonConfig) {
-             // Execute with Piston (Free)
-             console.log(`[Submission] Executing via Piston: ${pistonUrl}/execute`);
-             try {
-                const response = await fetch(`${pistonUrl}/execute`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        language: pistonConfig.language,
-                        version: pistonConfig.version,
-                        files: [
-                            {
-                                content: wrappedCode
-                            }
-                        ],
-                        stdin: testCase.input,
-                    }),
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`[Submission] Piston Error: ${response.status} - ${errorText}`);
-                    throw new Error(`Piston API Error: ${response.status} ${errorText}`);
-                }
-
-                const data = await response.json();
-                console.log("[Submission] Piston Response:", JSON.stringify(data).substring(0, 200) + "...");
-                
-                // Map Piston response to Judge0-like format
-                result = {
-                    stdout: data.run.stdout,
-                    stderr: data.run.stderr,
-                    compile_output: data.compile?.stderr || "",
-                    time: "0.01",
-                    memory: "0",
-                    status: {
-                        id: data.run.code === 0 ? 3 : 6,
-                        description: data.run.code === 0 ? "Accepted" : "Runtime Error"
-                    }
-                };
-             } catch (err) {
-                 console.error("[Submission] Piston Failed:", err);
-                 // Fallback to CodeX API will happen if result is empty
-             }
-        }
-
-        // 3.1. Fallback: CodeX API (Free, Public)
-        if (!result.stdout && !result.stderr && !result.compile_output) {
-             const codexLang = {
-                 "63": "js",
-                 "71": "py",
-                 "62": "java",
-                 "54": "cpp"
-             }[languageId];
-
-             if (codexLang) {
-                 console.log(`[Submission] Attempting CodeX API (Fallback) for ${codexLang}`);
-                 try {
-                    const params = new URLSearchParams();
-                    params.append("code", wrappedCode);
-                    params.append("language", codexLang);
-                    params.append("input", testCase.input);
-
-                    const response = await fetch("https://api.codex.jaagrav.in", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: params
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        result = {
-                            stdout: data.output || "",
-                            stderr: data.error || "",
-                            compile_output: "",
-                            time: "0.01", 
-                            memory: "0",
-                            status: {
-                                id: (data.error) ? 6 : 3,
-                                description: (data.error) ? "Runtime Error" : "Accepted"
-                            }
-                        };
-                         console.log("[Submission] CodeX Success");
-                    } else {
-                        console.error(`[Submission] CodeX Error: ${response.status}`);
-                    }
-                 } catch (e) {
-                      console.error("[Submission] CodeX Failed:", e);
-                 }
-             }
-        }
-
-        // 3.2. Fallback: Judge0 (if result still empty)
-        if (!result.stdout && !result.stderr && !result.compile_output) {
-
-
-            // Execute with Judge0 (Local/RapidAPI) - Fallback
-            const headers: Record<string, string> = { 
-            "Content-Type": "application/json" 
-            };
-            
-            if (process.env.JUDGE0_API_KEY) {
-                headers["X-RapidAPI-Key"] = process.env.JUDGE0_API_KEY;
-                headers["X-RapidAPI-Host"] = process.env.JUDGE0_API_HOST || "judge0-ce.p.rapidapi.com";
-            }
-
-            const response = await fetch(`${JUDGE0_URL}/submissions?wait=true`, {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-                source_code: wrappedCode,
-                language_id: parseInt(languageId),
-                stdin: testCase.input,
-            }),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Judge0 API Error: ${response.status} ${errorText}`);
-            }
-
-            result = await response.json();
+        try {
+            result = await universalExecute(code, languageId, testCase.input, problem.title);
+        } catch (err: any) {
+            console.error("[Submission] Execution Failed:", err);
+            // Result is still empty, will proceed to handle result.status below
         }
 
         // Check for runtime/compilation errors first (Status ID >= 6)
-        if (result.status.id >= 6) {
-           overallStatus = result.status.description;
+        if (!result.status || result.status.id >= 6) {
+           overallStatus = result.status?.description || "Runtime Error";
            // Save failed submission and return early
            const submission = await prisma.submission.create({
             data: {
