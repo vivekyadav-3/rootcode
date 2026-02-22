@@ -1,8 +1,10 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
+// Initialize the new Google GenAI SDK client
+const client = new GoogleGenAI({ 
+  apiKey: process.env.GEMINI_API_KEY || "",
+});
 
 export async function POST(req: Request) {
   try {
@@ -10,6 +12,7 @@ export async function POST(req: Request) {
       console.error("AI Chat Error: GEMINI_API_KEY is not set in environment variables");
       return NextResponse.json({ error: "AI Assistant is not configured. Please add your GEMINI_API_KEY to the .env file." }, { status: 500 });
     }
+    
     const { messages, context } = await req.json();
     const { problemTitle, problemDescription, currentCode, language } = context;
 
@@ -33,10 +36,8 @@ export async function POST(req: Request) {
       5. If the user asks general questions, answer them in the context of coding.
     `;
 
-    // Construct history for Gemini
-    // Gemini history MUST alternate between 'user' and 'model' roles, starting with 'user'.
-    
-    // 1. Start with the system prompt (User) and Gemini's acknowledgement (Model)
+    // 1. Prepare history for the new @google/genai SDK
+    // Syntax: [{ role: 'user' | 'model', parts: [{ text: '...' }] }]
     const history: any[] = [
       {
         role: "user",
@@ -48,27 +49,24 @@ export async function POST(req: Request) {
       },
     ];
 
-    // 2. Add the actual conversation history, ensuring we alternate
-    // Filter out the initial welcome message from the client to avoid starting with 'model' 
-    // since we already have our own model acknowledgement.
-    const userAndModelMessages = messages.filter((m: any) => m.content !== "Hi! I'm your AI coding assistant. Stuck on a problem? Ask me for a hint, explanation, or help with debugging!");
-    
-    // Add existing pairs
-    const chatHistory = userAndModelMessages.slice(0, -1).map((m: any) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
-
-    // Start chat with combined history
-    const chat = model.startChat({
-      history: [...history, ...chatHistory]
-    });
+    // Filter welcome message and map to new role names
+    const chatHistory = messages
+      .filter((m: any) => m.content !== "Hi! I'm your AI coding assistant. Stuck on a problem? Ask me for a hint, explanation, or help with debugging!")
+      .slice(0, -1)
+      .map((m: any) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
 
     const lastMessage = messages[messages.length - 1].content;
-    console.log("AI Chat: Sending message to Gemini...");
+    console.log("AI Chat: Sending message to Gemini using new SDK...");
     
-    const result = await chat.sendMessage(lastMessage);
-    const response = await result.response;
+    // 2. Call the new generateContent method
+    const response = await client.models.generateContent({
+      model: "gemini-2.0-flash", // Using the robust 2.0 Flash model
+      contents: [...history, ...chatHistory, { role: "user", parts: [{ text: lastMessage }] }]
+    });
+
     const text = response.text();
     
     console.log("AI Chat: Gemini response success");
