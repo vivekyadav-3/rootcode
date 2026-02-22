@@ -97,7 +97,60 @@ export async function universalExecute(code: string, languageId: string, stdin: 
         }
     }
 
-    // 3. Last Resort: Judge0
+    // 3. Attempt Paiza.io (Public Fallback - No Key Required)
+    const paizaLang = { "63": "javascript", "71": "python3", "62": "java", "54": "cpp" }[languageId];
+    if (paizaLang) {
+        try {
+            console.log(`[Execution] Attempting Paiza.io for ${paizaLang}...`);
+            const createRes = await fetch("https://api.paiza.io/runners/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    source_code: wrappedCode,
+                    language: paizaLang,
+                    input: stdin,
+                    api_key: "guest"
+                })
+            });
+
+            if (createRes.ok) {
+                const { id } = await createRes.json();
+                
+                // Poll for results (max 10 seconds)
+                let attempts = 0;
+                while (attempts < 10) {
+                    const statusRes = await fetch(`https://api.paiza.io/runners/get_details?id=${id}&api_key=guest`);
+                    if (statusRes.ok) {
+                        const data = await statusRes.json();
+                        if (data.status === "completed") {
+                            console.log("[Execution] Paiza.io success");
+                            return {
+                                stdout: data.stdout || "",
+                                stderr: data.stderr || data.build_stderr || "",
+                                compile_output: data.build_stderr || "",
+                                time: data.time || "0.01",
+                                memory: "0",
+                                status: {
+                                    id: data.result === "success" ? 3 : 6,
+                                    description: data.result === "success" ? "Accepted" : "Runtime Error"
+                                }
+                            };
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 1000));
+                    attempts++;
+                }
+                errors.push("Paiza.io: Execution timed out (took too long)");
+            } else {
+                errors.push(`Paiza.io (${createRes.status}): Service unavailable`);
+            }
+        } catch (e: any) {
+            console.error("[Execution] Paiza.io Attempt Failed:", e.message);
+            errors.push(`Paiza.io Error: ${e.message}`);
+        }
+    }
+
+    // 4. Last Resort: Judge0 (RapidAPI or Local)
     const judge0_url = process.env.JUDGE0_URL || "http://localhost:2358";
     try {
         console.log(`[Execution] Attempting Judge0 at ${judge0_url}...`);
@@ -129,5 +182,15 @@ export async function universalExecute(code: string, languageId: string, stdin: 
         errors.push(`Judge0 Error: ${e.message}`);
     }
 
-    throw new Error(`All execution services failed.\nDetails:\n- ${errors.join('\n- ')}`);
+    const errorMsg = `Code execution failed.
+    
+NOTICE: As of Feb 15 2026, the public Piston API (EMKC) is Whitelist-only.
+Current Failures:
+${errors.map(err => `- ${err}`).join('\n')}
+
+Recommended Solution:
+1. Sign up for a free Judge0 account on RapidAPI.
+2. Add your 'JUDGE0_API_KEY' to Vercel environment variables.`;
+
+    throw new Error(errorMsg);
 }
