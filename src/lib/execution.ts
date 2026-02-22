@@ -151,10 +151,13 @@ export async function universalExecute(code: string, languageId: string, stdin: 
     }
 
     // 4. Last Resort: Judge0 (RapidAPI or Local)
-    const judge0_url = process.env.JUDGE0_URL || "http://localhost:2358";
+    // If a key is provided but no URL, default to the RapidAPI endpoint
+    const judge0_url = process.env.JUDGE0_URL || (process.env.JUDGE0_API_KEY ? "https://judge0-ce.p.rapidapi.com" : "http://localhost:2358");
+    
     try {
         console.log(`[Execution] Attempting Judge0 at ${judge0_url}...`);
         const headers: Record<string, string> = { "Content-Type": "application/json" };
+        
         if (process.env.JUDGE0_API_KEY) {
             headers["X-RapidAPI-Key"] = process.env.JUDGE0_API_KEY;
             headers["X-RapidAPI-Host"] = process.env.JUDGE0_API_HOST || "judge0-ce.p.rapidapi.com";
